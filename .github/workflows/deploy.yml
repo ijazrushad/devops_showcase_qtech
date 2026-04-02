@@ -119,7 +119,7 @@ jobs:
               "if [ ! -d \".git\" ]; then git clone https://github.com/${{ github.repository }}.git .; else git pull origin main; fi",
               "export GITHUB_REPOSITORY_OWNER=${{ github.repository_owner }}",
               "echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin",
-              "docker compose pull app",
+              "docker compose pull",
               "docker compose up -d --no-deps --build app",
               "docker compose up -d"
             ]' \
