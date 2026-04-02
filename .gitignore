@@ -1,0 +1,17 @@
+# Node modules
+app/node_modules/
+npm-debug.log
+
+# Environment variables
+.env
+.env.local
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Terraform state and backup files
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
