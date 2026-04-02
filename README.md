@@ -200,6 +200,14 @@ Using the **PLG Stack (Prometheus + Loki + Grafana)**:
 | Visualization | Grafana | Unified dashboards |
 
 ---
+## Acess Credential
+
+| Service | Username | Password |
+|---------|----------|----------|
+| Grafana Dashboard | admin | admin |
+| Prometheus UI | No Auth (Internal) | N/A |
+
+Note: For this evaluation, the Grafana instance has been reset to default credentials. In a production environment, these would be managed via AWS Secrets Manager or HashiCorp Vault
 
 ## Summary
 
