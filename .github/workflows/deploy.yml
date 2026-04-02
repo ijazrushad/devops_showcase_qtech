@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: ./app/package-lock.json
 
@@ -38,17 +38,32 @@ jobs:
     needs: quality-checks
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write # Upgraded to write to create GitHub Releases/Tags
       packages: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # 1. Automatically calculate the next version (v1.0.0, v1.0.1, etc.)
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 2. Create a GitHub Release with the changelog
+      - name: Create a GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.new_tag }}
+          name: Release ${{ steps.tag_version.outputs.new_tag }}
+          body: ${{ steps.tag_version.outputs.changelog }}
+
       - name: Build Docker Image (Local)
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./app
-          load: true # Loads image into local Docker daemon for scanning
+          load: true
           tags: qtec-api:local
 
       - name: Run Trivy Vulnerability Scanner
@@ -56,25 +71,27 @@ jobs:
         with:
           image-ref: 'qtec-api:local'
           format: 'table'
-          # Set exit-code to 1 to fail the pipeline if HIGH/CRITICAL CVEs are found
           exit-code: '0'
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
       - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      # 3. Push to GHCR with BOTH the 'latest' tag and the specific version tag
       - name: Push Docker Image to GHCR
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: ./app
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/qtec-api:latest
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/qtec-api:latest
+            ghcr.io/${{ github.repository_owner }}/qtec-api:${{ steps.tag_version.outputs.new_tag }}
 
   # JOB 3: Zero-Downtime Deployment
   deploy:
