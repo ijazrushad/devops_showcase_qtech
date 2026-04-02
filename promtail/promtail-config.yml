@@ -14,10 +14,10 @@ scrape_configs:
       - host: unix:///var/run/docker.sock
         refresh_interval: 5s
     relabel_configs:
-
+      # Use a wildcard to catch the project name even if Docker removed underscores
       - source_labels: ['__meta_docker_container_label_com_docker_compose_project']
-        regex: 'devops_showcase_qtech'
+        regex: '.*qtech.*'
         action: keep
-
+      # Extract the specific container service name (app or nginx)
       - source_labels: ['__meta_docker_container_label_com_docker_compose_service']
         target_label: 'service'
