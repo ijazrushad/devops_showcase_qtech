@@ -140,7 +140,7 @@ docker compose up -d --no-deps --build app
 * Connection pooling prevents request loss
 * Downtime limited to milliseconds
 
-> **Scaling Note:** For full zero-downtime at scale, move to Kubernetes with RollingUpdate + multiple replicas.
+> **Scaling Note:** For full zero-downtime at scale, need to move to Kubernetes with RollingUpdate + multiple replicas.
 
 ---
 
