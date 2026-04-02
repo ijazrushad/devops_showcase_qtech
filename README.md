@@ -1,5 +1,13 @@
 # DevOps Engineer Practical Task - Showcase
 
+## URL Test
+
+* API Status (GET): http://app.18.143.227.177.nip.io:5115/status
+* API Data (POST): http://app.18.143.227.177.nip.io:5115/data
+* API Metrics: http://app.18.143.227.177.nip.io:5115/metrics
+* Grafana Dashboard: http://monitor.18.143.227.177.nip.io:5117
+* Prometheus UI: http://18.143.227.177:5116
+
 ## System Architecture
 
 The system is designed as a **production-style microservices stack** deployed on an AWS EC2 instance using Docker Compose for orchestration.
