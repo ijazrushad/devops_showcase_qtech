@@ -43,6 +43,7 @@ services:
       - prometheus
       - loki
 
+
   # Logging Stack
   loki:
     image: grafana/loki:latest

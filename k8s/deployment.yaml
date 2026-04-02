@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qtec-api-deployment
+  labels:
+    app: qtec-api
+spec:
+  replicas: 3 #  Horizontal Scaling
+  strategy:
+    type: RollingUpdate #  Rolling Updates
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: qtec-api
+  template:
+    metadata:
+      labels:
+        app: qtec-api
+    spec:
+      containers:
+      - name: qtec-api
+        image: ghcr.io/ijazrushad/qtec-api:latest
+        ports:
+        - containerPort: 3000
+        resources: # Resource management
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+        securityContext:
+          runAsNonRoot: true # Non-root container
+          allowPrivilegeEscalation: false

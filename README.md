@@ -46,6 +46,26 @@ The system is designed as a **production-style microservices stack** deployed on
 
 ---
 
+## Advanced Infrastructure Showcase (Simulation)
+
+While the live demo is hosted on a shared EC2 instance for cost-efficiency and immediate review, the repository includes Production-Ready Infrastructure-as-Code (IaC) and Orchestration manifests to demonstrate scalability.
+
+* Infrastructure as Code (Terraform)
+Located in /terraform, these files demonstrate the ability to provision a complete AWS environment automatically.
+
+Resources: VPC, Public/Private Subnets, and Security Groups.
+
+EKS Integration: Configurations for an AWS EKS Cluster with Managed Node Groups, moving away from single-instance risks.
+
+* Container Orchestration (Kubernetes)
+Located in /k8s, these manifests show a transition to cloud-native management.
+
+Deployment: Features Horizontal Pod Autoscaling (HPA) and Rolling Updates.
+
+Self-Healing: Liveness and Readiness probes ensure traffic only reaches healthy containers.
+
+Security: Implements Non-Root execution policies and Resource Quotas (CPU/Memory limits) to prevent "noisy neighbor" issues.
+
 ## Core Components
 
 ### API Service
@@ -136,12 +156,12 @@ Optimized using three layers:
 
 ## Challenges & Troubleshooting
 
-### 1Shared Environment Port Conflicts
+### Shared Environment Port Conflicts
 
 * **Problem:** Ports already in use (80, 3000, 9090)
 * **Fix:** Remapped ports to `5115–5118`
 
-### 2Loki "Timestamp Too Old" Errors
+### Loki "Timestamp Too Old" Errors
 
 * **Problem:** Old logs rejected (>7 days)
 * **Fix:** Applied regex filter `.*qtech.*` + adjusted initial ingestion settings
@@ -150,6 +170,22 @@ Optimized using three layers:
 
 * **Problem:** Promtail couldn't detect containers
 * **Fix:** Mounted `/var/run/docker.sock` and ran Promtail as `root`
+
+### The SSL / ACME Challenge Conflict
+
+* **Problem:** Attempted to implement Let's Encrypt SSL via Certbot. However, the HTTP-01 challenge requires Port 80, which was managed by a host-level Nginx.
+
+* **Failed Attempt:** Initially tried internal SSL termination, but it caused a 404 Unauthorized because the host Nginx intercepted the traffic.
+
+* **The Pivot:** To maintain a clean and portable architecture, I reverted to a stable HTTP Reverse Proxy model. This demonstrates a "Separation of Concerns"—the application handles logic, while SSL is logically offloaded to an edge load balancer or host-level proxy.
+
+### Monitoring Data Persistence
+
+* **Problem:** Manual Grafana dashboards were lost during a docker compose down because volumes weren't initially persistent.
+
+* **Fix:** Implemented Monitoring as Code by exporting the dashboard as a JSON model into GitHub (/grafana/dashboards/).
+Added Named Docker Volumes for Grafana and Prometheus to ensure metrics survive restarts.
+
 
 ---
 
