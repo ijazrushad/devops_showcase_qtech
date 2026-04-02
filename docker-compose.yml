@@ -38,7 +38,7 @@ services:
     image: grafana/loki:latest
     ports:
       - "5118:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml -validation.reject-old-samples=false
 
   promtail:
     image: grafana/promtail:latest
